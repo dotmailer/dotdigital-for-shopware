@@ -8,7 +8,6 @@
 {% set canSendCartInsight = hasCorrectConfig and canSendToCurrentUser %}
 
 {% if canSendCartInsight %}
-
     {% set payloadData = {
         customer_email: context.customer.email | default(''),
         program_id: config('DotdigitalForShopware.config.acProgramId'),
@@ -18,10 +17,14 @@
         cart_phase: cartPhase
     } %}
 
-    {% if cartPhase == 'ORDER_COMPLETE' %}
+    {% if cartPhase == 'CART_INFO' %}
+        {% set cartObject = page.cart %}
+    {% elseif cartPhase == 'ORDER_COMPLETE' %}
         {% set payloadData = payloadData|merge({cart_delay:0}) %}
         {% set cartObject = page.order %}
+    {% endif %}
 
+    {% if cartObject is not null %}
         {# process line items to build product payload and calculate discount #}
         {% set discountTotal = 0 %}
         {% set processedLineItems = [] %}
@@ -45,8 +48,9 @@
                     sale_price: lineItem.price.unitPrice,
                     total_price: lineItem.price.totalPrice,
                     image_url: lineItem.cover.url,
-                    product_url: seoUrl('frontend.detail.page', { productId: lineItem.productId })
+                    product_url: seoUrl('frontend.detail.page', { productId: lineItem.productId ?? lineItem.referencedId })
                 } %}
+
                 {% set processedLineItems = processedLineItems|merge([productData]) %}
             {% endif %}
         {% endfor %}
@@ -64,7 +68,7 @@
         {% endfor %}
 
         {% set payloadData = payloadData|merge({
-            cart_id: page.order.orderNumber,
+            cart_id: cartObject.orderNumber ?? cartObject.token ?? '',
             subtotal: cartObject.price.netPrice | default(0),
             shipping: shippingTotal,
             discount_amount: discountTotal,
@@ -72,13 +76,13 @@
             grand_total: cartObject.price.totalPrice | default(0),
             line_items: processedLineItems
         }) %}
-
     {% endif %}
 
     {% set cartInsightHandlerPluginOptions = {
         data: payloadData
     } %}
 
-    <template data-cart-insight-handler-plugin data-cart-insight-handler-plugin-options='{{ cartInsightHandlerPluginOptions|json_encode }}'></template>
-
+    {% block cart_insight_handler_plugin_element %}
+        <template data-cart-insight-handler-plugin data-cart-insight-handler-plugin-options='{{ cartInsightHandlerPluginOptions|json_encode }}'></template>
+    {% endblock %}
 {% endif %}
