@@ -21,6 +21,11 @@ git clone https://github.com/dotmailer/dotdigital-for-shopware.git DotdigitalFor
 
 ## Changelog
 
+### 2.0.2
+
+##### Bug fixes
+- The cart URL for CartInsight wasn't working consistently across different Sales Channels; this has been fixed. [External contribution](https://github.com/dotmailer/dotdigital-for-shopware/pull/1)
+
 ### 2.0.1
 
 ##### Improvements
