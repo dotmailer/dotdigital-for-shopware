@@ -4,7 +4,7 @@ Dotdigital for Shopware is now available for Shopware merchants.
 
 ## Requirements
 - Shopware 6.5+
-    - Shopware 6.4.x is compatible up with the app's 1.x release line.
+    - Shopware 6.4.x is compatible with the app's 1.x release line.
 
 ## Installation
 
@@ -20,6 +20,11 @@ git clone https://github.com/dotmailer/dotdigital-for-shopware.git DotdigitalFor
 ```
 
 ## Changelog
+
+### 2.0.2
+
+##### Bug fixes
+- The cart URL for CartInsight wasn't working consistently across different Sales Channels; this has been fixed. [External contribution](https://github.com/dotmailer/dotdigital-for-shopware/pull/1)
 
 ### 2.0.1
 
