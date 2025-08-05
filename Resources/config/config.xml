@@ -4,11 +4,6 @@
     <card>
         <title>Tracking</title>
 
-        <input-field type="checkbox">
-            <name>siteRoiTrackingEnabled</name>
-            <label>Enable site and ROI tracking</label>
-        </input-field>
-
         <input-field type="single-select">
             <name>region</name>
             <label>Select region</label>
@@ -30,31 +25,42 @@
 
         <input-field type="text">
             <name>wbtProfileId</name>
-            <label>Web behavior tracking profile ID</label>
+            <label>Dotdigital Tag ID</label>
+            <helpText><![CDATA[Adding the Dotdigital Tag to your website enables Web behavior tracking and Site tracking. <a href="https://support.dotdigital.com/en/articles/9298184-add-the-dotdigital-tag-to-your-website" target="_blank">Learn more</a>.]]></helpText>
+        </input-field>
+
+        <input-field type="checkbox">
+            <name>siteRoiTrackingEnabled</name>
+            <label>Enable ROI tracking</label>
         </input-field>
     </card>
 
     <card>
-        <title>Abandoned carts</title>
+        <title>Abandoned carts (deprecated, see Help Text)</title>
 
         <input-field type="checkbox">
             <name>acEnabled</name>
             <label>Enable abandoned cart</label>
+            <disabled>true</disabled>
+            <helpText lang="en-GB">These settings have moved. Abandoned cart program selection, enrolment delay and enabling guest carts, must now be configured in your Dotdigital account. Please visit Connect > Connect website and edit the Abandoned cart settings.</helpText>
         </input-field>
 
         <input-field type="text">
             <name>acProgramId</name>
             <label>Abandoned cart program ID</label>
+            <disabled>true</disabled>
         </input-field>
 
         <input-field type="int">
             <name>acDelay</name>
             <label>Allow abandoned cart delay (minutes)</label>
+            <disabled>true</disabled>
         </input-field>
 
         <input-field type="checkbox">
             <name>acAllowNonSubscribers</name>
             <label>Allow abandoned cart for non-subscribed contacts</label>
+            <disabled>true</disabled>
         </input-field>
     </card>
 </config>

@@ -1,0 +1,9 @@
+{% sw_extends '@Storefront/storefront/page/checkout/confirm/index.html.twig' %}
+
+{% block base_body_script %}
+    {{ parent() }}
+
+    {% sw_include '@DotdigitalForShopware/storefront/component/cart-insight.html.twig' with {
+        param_cart_phase: 'ORDER_CHECKOUT'
+    } %}
+{% endblock %}

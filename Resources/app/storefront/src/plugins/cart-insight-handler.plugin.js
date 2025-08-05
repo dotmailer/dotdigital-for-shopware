@@ -3,12 +3,9 @@ import HttpClient from 'src/service/http-client.service';
 import CartInsight from '../cart-insight';
 
 export default class CartInsightHandlerPlugin extends Plugin {
-    static options = {}
+    static options = {};
 
     init() {
-        if (typeof window.dmPt === 'undefined') {
-            return;
-        }
 
         this._cartInsight = new CartInsight();
         this._client = new HttpClient();
@@ -25,11 +22,11 @@ export default class CartInsightHandlerPlugin extends Plugin {
         if (document.querySelector('[data-offcanvas-cart]')) {
             const plugin = window.PluginManager.getPluginInstanceFromElement(
                 document.querySelector('[data-offcanvas-cart]'),
-                'OffCanvasCart'
+                'OffCanvasCart',
             );
             plugin.$emitter.subscribe(
                 'onRemoveProductFromCart',
-                () => this.setCartPreviouslyHadItems(true)
+                () => this.setCartPreviouslyHadItems(true),
             );
         }
     }
@@ -103,16 +100,16 @@ export default class CartInsightHandlerPlugin extends Plugin {
                 el.price.unitPrice;
 
             const productData = {
+                id: el.id || '',
                 sku: el.payload.productNumber || '',
                 name: el.label,
-                description: el.description || '',
                 quantity: el.quantity,
                 unit_price: unitPrice,
                 sale_price: el.price.unitPrice,
                 total_price: el.price.totalPrice,
                 image_url: el.cover ? el.cover.url : '',
                 product_url: this.getProductUrl(el),
-            }
+            };
 
             processedLineItems.push(productData);
         });
@@ -121,7 +118,7 @@ export default class CartInsightHandlerPlugin extends Plugin {
     }
 
     getProductUrl(product) {
-        return location.protocol + '//' + location.host + '/detail/' + product.id;
+        return `${location.protocol}//${location.host}/detail/${product.id}`;
     }
 
     setCartPreviouslyHadItems(value) {

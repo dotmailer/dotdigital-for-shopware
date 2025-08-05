@@ -37,9 +37,9 @@
                 %}
 
                 {% set productData = {
+                    id: lineItem.id,
                     sku: lineItem.payload.productNumber,
                     name: lineItem.label,
-                    description: lineItem.description | default(''),
                     quantity: lineItem.quantity,
                     unit_price: unitPrice,
                     sale_price: lineItem.price.unitPrice,

@@ -5,6 +5,7 @@
 
     {% if config('DotdigitalForShopware.config.wbtProfileId') %}
         {% set wbtPluginOptions = {
+            regionId: config('DotdigitalForShopware.config.region'),
             profileId: config('DotdigitalForShopware.config.wbtProfileId')
         } %}
         {% if page.product %}
@@ -14,17 +15,19 @@
             {% set hasDiscountedPrice = listPrice > unitPrice %}
 
             {% set productData = {
-                product_name: page.product.name | default(''),
-                product_url: seoUrl('frontend.detail.page', { productId: page.product.id }) | default(''),
-                product_currency: context.currency.isoCode | default(''),
-                product_status: page.product.availableStock > 0 ? 'In stock' : 'Out of stock',
-                product_price: hasDiscountedPrice ? listPrice : unitPrice,
-                product_specialPrice: hasDiscountedPrice ? unitPrice : 0,
-                product_sku: page.product.productNumber | default(''),
-                product_categories: page.product.seoCategory.name | default(''),
-                product_image_path: page.product.cover.media.url | default(''),
-                product_description: page.product.description | default(''),
-                product_brand: page.product.manufacturer.name | default('')
+                productId: page.product.productNumber | default(''),
+                sku: page.product.productNumber | default(''),
+                name: page.product.translated.name ? page.product.translated.name : page.product.name | default(''),
+                url: seoUrl('frontend.detail.page', { productId: page.product.id }) | default(''),
+                imageUrl: page.product.cover.media.url | default(''),
+                price: hasDiscountedPrice ? listPrice : unitPrice,
+                currency: context.currency.isoCode | default(''),
+                salePrice: hasDiscountedPrice ? unitPrice : 0,
+                status: page.product.availableStock > 0 ? 'In stock' : 'Out of stock',
+                stock: page.product.stock,
+                description: page.product.translated.description ? page.product.translated.description : page.product.description | default(''),
+                categories: page.product.seoCategory.name ? [page.product.seoCategory.name] : [],
+                brand: page.product.manufacturer.name | default('')
             } %}
             {% set wbtPluginOptions = wbtPluginOptions|merge({ productData: productData }) %}
         {% endif %}
