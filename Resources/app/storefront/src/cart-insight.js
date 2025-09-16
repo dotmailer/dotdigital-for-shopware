@@ -13,8 +13,6 @@ export default class CartInsight {
         }
 
         const insightData = {
-            programId: data.program_id,
-            cartDelay: data.cart_delay,
             cartId: data.cart_id,
             cartPhase: data.cart_phase,
             currency: data.currency,

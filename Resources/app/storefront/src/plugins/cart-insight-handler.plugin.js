@@ -43,10 +43,6 @@ export default class CartInsightHandlerPlugin extends Plugin {
     handleData(cart) {
         const payload = this.options.data;
 
-        if (!cart.lineItems.length) {
-            payload.cart_delay = 0;
-        }
-
         payload.cart_id = cart.token;
         payload.subtotal = cart.price.netPrice;
         payload.shipping = this.calculateShipping(cart.deliveries);
