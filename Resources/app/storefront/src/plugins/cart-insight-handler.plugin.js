@@ -19,15 +19,21 @@ export default class CartInsightHandlerPlugin extends Plugin {
             }
         }
 
-        if (document.querySelector('[data-offcanvas-cart]')) {
-            const plugin = window.PluginManager.getPluginInstanceFromElement(
-                document.querySelector('[data-offcanvas-cart]'),
-                'OffCanvasCart',
-            );
-            plugin.$emitter.subscribe(
-                'onRemoveProductFromCart',
-                () => this.setCartPreviouslyHadItems(true),
-            );
+        const offCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
+
+        if (!offCanvasInstances) {
+            return;
+        }
+
+        for (let i = 0; i < offCanvasInstances.length; i++) {
+            const offCanvas = offCanvasInstances[i];
+
+            if (!offCanvas['_' + i + '_subscribed']) {
+                offCanvas.$emitter.subscribe('onRemoveProductFromCart', () =>
+                    this.setCartPreviouslyHadItems(true),
+                );
+                offCanvas['_' + i + '_subscribed'] = true;
+            }
         }
     }
 
