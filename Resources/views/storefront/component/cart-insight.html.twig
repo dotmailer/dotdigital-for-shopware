@@ -3,6 +3,8 @@
 {# Detect cart phase based on page context #}
 {% if page.order and app.request.attributes.get('_route') == 'frontend.checkout.finish.page' %}
     {% set cartPhase = 'ORDER_COMPLETE' %}
+{% elseif app.request.attributes.get('_route') == 'frontend.checkout.register.page' %}
+    {% set cartPhase = 'ORDER_CHECKOUT' %}
 {% elseif app.request.attributes.get('_route') == 'frontend.checkout.confirm.page' %}
     {% set cartPhase = 'ORDER_CHECKOUT' %}
 {% endif %}
