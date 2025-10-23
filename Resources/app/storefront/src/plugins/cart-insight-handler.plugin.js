@@ -18,30 +18,17 @@ export default class CartInsightHandlerPlugin extends Plugin {
                 this.getCart();
             }
         }
-
-        const offCanvasInstances = window.PluginManager.getPluginList().OffCanvasCart.get('instances');
-
-        if (!offCanvasInstances) {
-            return;
-        }
-
-        for (let i = 0; i < offCanvasInstances.length; i++) {
-            const offCanvas = offCanvasInstances[i];
-
-            if (!offCanvas['_' + i + '_subscribed']) {
-                offCanvas.$emitter.subscribe('onRemoveProductFromCart', () =>
-                    this.setCartPreviouslyHadItems(true),
-                );
-                offCanvas['_' + i + '_subscribed'] = true;
-            }
-        }
     }
 
     getCart() {
         this._client.get(window.router['frontend.checkout.cart.json'], (response) => {
             const cart = JSON.parse(response);
-            if (cart.lineItems.length || window.cartPreviouslyHadItems) {
+            if (cart.lineItems.length || this.getCartPreviouslyHadItems() === 'true') {
                 this.handleData(cart);
+
+                if (this.getCartPreviouslyHadItems() === 'true' && cart.lineItems.length === 0){
+                    this.setCartPreviouslyHadItems('false');
+                }
             }
         });
     }
@@ -56,7 +43,9 @@ export default class CartInsightHandlerPlugin extends Plugin {
         payload.tax_amount = this.calculateTax(cart.price.calculatedTaxes);
         payload.grand_total = cart.price.totalPrice;
         payload.line_items = this.prepareLineItems(cart.lineItems);
-
+        if (cart.lineItems.length > 0){
+            this.setCartPreviouslyHadItems('true');
+        }
         this._cartInsight.init(payload);
     }
 
@@ -124,6 +113,10 @@ export default class CartInsightHandlerPlugin extends Plugin {
     }
 
     setCartPreviouslyHadItems(value) {
-        window.cartPreviouslyHadItems = value;
+        localStorage.setItem('cartPreviouslyHadItems', value);
+    }
+
+    getCartPreviouslyHadItems() {
+        return localStorage.getItem('cartPreviouslyHadItems');
     }
 }
