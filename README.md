@@ -21,6 +21,14 @@ git clone https://github.com/dotmailer/dotdigital-for-shopware.git DotdigitalFor
 
 ## Changelog
 
+### 3.0.0
+
+##### What’s new
+- The connector's various client-side tracking scripts have been converted to use the unified Dotdigital Tag.
+
+##### Notes
+- Web behavior tracking, abandoned cart and abandoned browse must now be configured from inside Dotdigital via Connect > Connect website.
+
 ### 2.0.2
 
 ##### Bug fixes

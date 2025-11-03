@@ -3,12 +3,9 @@ import HttpClient from 'src/service/http-client.service';
 import CartInsight from '../cart-insight';
 
 export default class CartInsightHandlerPlugin extends Plugin {
-    static options = {}
+    static options = {};
 
     init() {
-        if (typeof window.dmPt === 'undefined') {
-            return;
-        }
 
         this._cartInsight = new CartInsight();
         this._client = new HttpClient();
@@ -21,34 +18,23 @@ export default class CartInsightHandlerPlugin extends Plugin {
                 this.getCart();
             }
         }
-
-        if (document.querySelector('[data-offcanvas-cart]')) {
-            const plugin = window.PluginManager.getPluginInstanceFromElement(
-                document.querySelector('[data-offcanvas-cart]'),
-                'OffCanvasCart'
-            );
-            plugin.$emitter.subscribe(
-                'onRemoveProductFromCart',
-                () => this.setCartPreviouslyHadItems(true)
-            );
-        }
     }
 
     getCart() {
         this._client.get(window.router['frontend.checkout.cart.json'], (response) => {
             const cart = JSON.parse(response);
-            if (cart.lineItems.length || window.cartPreviouslyHadItems) {
+            if (cart.lineItems.length || this.getCartPreviouslyHadItems() === 'true') {
                 this.handleData(cart);
+
+                if (this.getCartPreviouslyHadItems() === 'true' && cart.lineItems.length === 0){
+                    this.setCartPreviouslyHadItems('false');
+                }
             }
         });
     }
 
     handleData(cart) {
         const payload = this.options.data;
-
-        if (!cart.lineItems.length) {
-            payload.cart_delay = 0;
-        }
 
         payload.cart_id = cart.token;
         payload.subtotal = cart.price.netPrice;
@@ -57,7 +43,9 @@ export default class CartInsightHandlerPlugin extends Plugin {
         payload.tax_amount = this.calculateTax(cart.price.calculatedTaxes);
         payload.grand_total = cart.price.totalPrice;
         payload.line_items = this.prepareLineItems(cart.lineItems);
-
+        if (cart.lineItems.length > 0){
+            this.setCartPreviouslyHadItems('true');
+        }
         this._cartInsight.init(payload);
     }
 
@@ -103,16 +91,16 @@ export default class CartInsightHandlerPlugin extends Plugin {
                 el.price.unitPrice;
 
             const productData = {
+                id: el.id || '',
                 sku: el.payload.productNumber || '',
                 name: el.label,
-                description: el.description || '',
                 quantity: el.quantity,
                 unit_price: unitPrice,
                 sale_price: el.price.unitPrice,
                 total_price: el.price.totalPrice,
                 image_url: el.cover ? el.cover.url : '',
                 product_url: this.getProductUrl(el),
-            }
+            };
 
             processedLineItems.push(productData);
         });
@@ -121,10 +109,14 @@ export default class CartInsightHandlerPlugin extends Plugin {
     }
 
     getProductUrl(product) {
-        return location.protocol + '//' + location.host + '/detail/' + product.id;
+        return `${location.protocol}//${location.host}/detail/${product.id}`;
     }
 
     setCartPreviouslyHadItems(value) {
-        window.cartPreviouslyHadItems = value;
+        localStorage.setItem('cartPreviouslyHadItems', value);
+    }
+
+    getCartPreviouslyHadItems() {
+        return localStorage.getItem('cartPreviouslyHadItems');
     }
 }

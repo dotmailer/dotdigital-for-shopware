@@ -1,25 +1,27 @@
-{% set cartPhase = param_cart_phase|default('CUSTOMER_LOGIN') %}
+{% set cartPhase = 'CUSTOMER_LOGIN' %}
+
+{# Detect cart phase based on page context #}
+{% if page.order and app.request.attributes.get('_route') == 'frontend.checkout.finish.page' %}
+    {% set cartPhase = 'ORDER_COMPLETE' %}
+{% elseif app.request.attributes.get('_route') == 'frontend.checkout.register.page' %}
+    {% set cartPhase = 'ORDER_CHECKOUT' %}
+{% elseif app.request.attributes.get('_route') == 'frontend.checkout.confirm.page' %}
+    {% set cartPhase = 'ORDER_CHECKOUT' %}
+{% endif %}
+
 {% set wbtProfileId = config('DotdigitalForShopware.config.wbtProfileId') %}
-{% set hasCorrectConfig = wbtProfileId and config('DotdigitalForShopware.config.acEnabled') and config('DotdigitalForShopware.config.acProgramId') %}
 
-{# Subscribers only #}
-{% set canSendToCurrentUser = (config('DotdigitalForShopware.config.acAllowNonSubscribers') == false and context.customer is not empty and context.customer.newsletter == false) ? false : true %}
-
-{% set canSendCartInsight = hasCorrectConfig and canSendToCurrentUser %}
-
-{% if canSendCartInsight %}
+{% if wbtProfileId %}
 
     {% set payloadData = {
         customer_email: context.customer.email | default(''),
-        program_id: config('DotdigitalForShopware.config.acProgramId'),
-        cart_delay: config('DotdigitalForShopware.config.acDelay'),
         currency: context.currency.isoCode | default(''),
         cart_url: app.request.schemeAndHttpHost ~ app.request.baseUrl ~ path('frontend.checkout.cart.page') | default(''),
         cart_phase: cartPhase
     } %}
 
     {% if cartPhase == 'ORDER_COMPLETE' %}
-        {% set payloadData = payloadData|merge({cart_delay:0}) %}
+
         {% set cartObject = page.order %}
 
         {# process line items to build product payload and calculate discount #}
@@ -37,9 +39,9 @@
                 %}
 
                 {% set productData = {
+                    id: lineItem.id,
                     sku: lineItem.payload.productNumber,
                     name: lineItem.label,
-                    description: lineItem.description | default(''),
                     quantity: lineItem.quantity,
                     unit_price: unitPrice,
                     sale_price: lineItem.price.unitPrice,

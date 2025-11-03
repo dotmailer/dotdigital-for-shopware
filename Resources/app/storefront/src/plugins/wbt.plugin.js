@@ -1,9 +1,15 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import CookieStorage from 'src/helper/storage/cookie-storage.helper';
 import { DotdigitalCookies } from '../cookies';
+import '../dotdigital-tag.js';
 
 export default class WbtPlugin extends Plugin {
     static options = {
+        /**
+         * Region
+         * @type string
+         */
+        regionId: '1',
         /**
          * Web behavior tracking profile ID
          * @type string
@@ -22,24 +28,14 @@ export default class WbtPlugin extends Plugin {
     };
 
     init() {
-        const { profileId, productData, ddEnabledCookie } = this.options;
+        const { regionId, profileId, productData, ddEnabledCookie } = this.options;
         const ddTrackingEnabled = CookieStorage.getItem(ddEnabledCookie);
-
         if (ddTrackingEnabled) {
-            (function (w, d, u, t, o, c) {
-                w['dmtrackingobjectname'] = o;
-                c = d.createElement(t);
-                c.async = 1;
-                c.src = u;
-                t = d.getElementsByTagName(t)[0];
-                t.parentNode.insertBefore(c, t);
-                w[o] = w[o] || function () {
-                    (w[o].q = w[o].q || []).push(arguments);
-                };
-            })(window, document, '//static.trackedweb.net/js/_dmptv4.js', 'script', 'dmPt');
+            window.ddg.init(regionId, profileId);
 
-            window.dmPt('create', profileId);
-            window.dmPt('track', productData);
+            if (productData && Object.keys(productData).length > 0) {
+                window.ddg.productBrowse(productData);
+            }
         }
     }
 }
